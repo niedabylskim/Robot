@@ -80,6 +80,52 @@ Mesh MeshLoader::GetSphere(int stacks, int slices, float radius /* = 0.5f */)
 		m_device.CreateIndexBuffer(indices), in);
 }
 
+Mesh MeshLoader::GetCylinder(int stacks, int slices, float radius /* = 0.5f */, float height /* = 1.0f */)
+{
+	auto n = (stacks + 1) * slices;
+	vector<VertexPosNormal> vertices(n);
+	auto y = height / 2;
+	auto dy = height / stacks;
+	auto dp = XM_2PI / slices;
+	auto k = 0;
+	for (auto i = 0; i <= stacks; ++i, y -= dy)
+	{
+		auto phi = 0.0f;
+		for (auto j = 0; j < slices; ++j, phi += dp)
+		{
+			float sinp, cosp;
+			XMScalarSinCos(&sinp, &cosp, phi);
+			vertices[k].Pos = XMFLOAT3(radius*cosp, y, radius*sinp);
+			vertices[k++].Normal = XMFLOAT3(cosp, 0, sinp);
+		}
+	}
+	auto in = 6 * stacks * slices;
+	vector<unsigned short> indices(in);
+	k = 0;
+	for (auto i = 0; i < stacks; ++i)
+	{
+		auto j = 0;
+		for (; j < slices - 1; ++j)
+		{
+			indices[k++] = i*slices + j;
+			indices[k++] = i*slices + j + 1;
+			indices[k++] = (i + 1)*slices + j + 1;
+			indices[k++] = i*slices + j;
+			indices[k++] = (i + 1)*slices + j + 1;
+			indices[k++] = (i + 1)*slices + j;
+		}
+		indices[k++] = i*slices + j;
+		indices[k++] = i*slices;
+		indices[k++] = (i + 1)*slices;
+		indices[k++] = i*slices + j;
+		indices[k++] = (i + 1)*slices;
+		indices[k++] = (i + 1)*slices + j;
+	}
+	return Mesh(m_device.CreateVertexBuffer(vertices), sizeof(VertexPosNormal),
+		m_device.CreateIndexBuffer(indices), in);
+}
+
+
 Mesh MeshLoader::GetQuad(float side /* = 1.0f */)
 {
 	side *= 5;

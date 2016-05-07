@@ -25,6 +25,12 @@ void PhongEffect::SetSurfaceColorBuffer(const shared_ptr<ConstantBuffer<XMFLOAT4
 		m_surfaceColorCB = surfaceColor;
 }
 
+void gk2::PhongEffect::SetAmbientBuffer(const std::shared_ptr<ConstantBuffer<DirectX::XMFLOAT4>>& surfaceColor)
+{
+	if (surfaceColor != nullptr)
+		m_ambient = surfaceColor;
+}
+
 void PhongEffect::SetVertexShaderData()
 {
 	ID3D11Buffer* vsb[4] = { m_worldCB->getBufferObject().get(), m_viewCB->getBufferObject().get(),
@@ -34,6 +40,6 @@ void PhongEffect::SetVertexShaderData()
 
 void PhongEffect::SetPixelShaderData()
 {
-	ID3D11Buffer* psb[1] = { m_surfaceColorCB->getBufferObject().get() };
-	m_context->PSSetConstantBuffers(0, 1, psb);
+	ID3D11Buffer* psb[2] = { m_surfaceColorCB->getBufferObject().get(),m_ambient->getBufferObject().get() };
+	m_context->PSSetConstantBuffers(0, 2, psb);
 }

@@ -13,6 +13,7 @@ namespace gk2
 
 		void SetLightPosBuffer(const std::shared_ptr<ConstantBuffer<DirectX::XMFLOAT4>>& lightPos);
 		void SetSurfaceColorBuffer(const std::shared_ptr<ConstantBuffer<DirectX::XMFLOAT4>>& surfaceColor);
+		void SetAmbientBuffer(const std::shared_ptr<ConstantBuffer<DirectX::XMFLOAT4>>& surfaceColor);
 
 	protected:
 		void SetVertexShaderData() override;
@@ -22,6 +23,7 @@ namespace gk2
 		static const std::wstring ShaderName;
 
 		std::shared_ptr<ConstantBuffer<DirectX::XMFLOAT4>> m_lightPosCB;
+		std::shared_ptr<ConstantBuffer<DirectX::XMFLOAT4>> m_ambient;
 		std::shared_ptr<ConstantBuffer<DirectX::XMFLOAT4>> m_surfaceColorCB;
 	};
 }

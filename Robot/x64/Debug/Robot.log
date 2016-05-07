@@ -1,42 +1,9 @@
-﻿Build started 2016-05-06 11:16:59.
-     1>Project "C:\Users\Malgosia\Downloads\Robot\Robot\Robot\Robot.vcxproj" on node 2 (Rebuild target(s)).
-     1>FxCompile:
-         C:\Program Files (x86)\Windows Kits\8.1\bin\x86\fxc.exe /nologo /E"main" /T ps_4_0 /Fo "C:\Users\Malgosia\Downloads\Robot\Robot\Robot\lightShadowPS.cso" /Od /Zi resources\shaders\lightShadowPS.hlsl 
-     1>C:\Users\Malgosia\Downloads\Robot\Robot\Robot\resources\shaders\lightShadowPS.hlsl(46,8-51): warning X3206: implicit truncation of vector type
-         
-         compilation object save succeeded; see C:\Users\Malgosia\Downloads\Robot\Robot\Robot\lightShadowPS.cso
-         C:\Program Files (x86)\Windows Kits\8.1\bin\x86\fxc.exe /nologo /E"main" /T vs_4_0 /Fo "C:\Users\Malgosia\Downloads\Robot\Robot\Robot\lightShadowVS.cso" /Od /Zi resources\shaders\lightShadowVS.hlsl 
-         compilation object save succeeded; see C:\Users\Malgosia\Downloads\Robot\Robot\Robot\lightShadowVS.cso
-         C:\Program Files (x86)\Windows Kits\8.1\bin\x86\fxc.exe /nologo /E"main" /T gs_4_0 /Fo "C:\Users\Malgosia\Downloads\Robot\Robot\Robot\particlesGS.cso" /Od /Zi resources\shaders\particlesGS.hlsl 
-         compilation object save succeeded; see C:\Users\Malgosia\Downloads\Robot\Robot\Robot\particlesGS.cso
-         C:\Program Files (x86)\Windows Kits\8.1\bin\x86\fxc.exe /nologo /E"main" /T ps_4_0 /Fo "C:\Users\Malgosia\Downloads\Robot\Robot\Robot\particlesPS.cso" /Od /Zi resources\shaders\particlesPS.hlsl 
-         compilation object save succeeded; see C:\Users\Malgosia\Downloads\Robot\Robot\Robot\particlesPS.cso
-         C:\Program Files (x86)\Windows Kits\8.1\bin\x86\fxc.exe /nologo /E"main" /T vs_4_0 /Fo "C:\Users\Malgosia\Downloads\Robot\Robot\Robot\particlesVS.cso" /Od /Zi resources\shaders\particlesVS.hlsl 
-         compilation object save succeeded; see C:\Users\Malgosia\Downloads\Robot\Robot\Robot\particlesVS.cso
-         C:\Program Files (x86)\Windows Kits\8.1\bin\x86\fxc.exe /nologo /E"main" /T ps_4_0 /Fo "C:\Users\Malgosia\Downloads\Robot\Robot\Robot\phongPS.cso" /Od /Zi resources\shaders\phongPS.hlsl 
-         compilation object save succeeded; see C:\Users\Malgosia\Downloads\Robot\Robot\Robot\phongPS.cso
-         C:\Program Files (x86)\Windows Kits\8.1\bin\x86\fxc.exe /nologo /E"main" /T vs_4_0 /Fo "C:\Users\Malgosia\Downloads\Robot\Robot\Robot\phongVS.cso" /Od /Zi resources\shaders\phongVS.hlsl 
-         compilation object save succeeded; see C:\Users\Malgosia\Downloads\Robot\Robot\Robot\phongVS.cso
-       ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Debug\\" /Fd"x64\Debug\vc140.pdb" /Gd /TP /errorReport:prompt gk2_applicationBase.cpp gk2_camera.cpp gk2_constantBuffer.cpp gk2_deviceHelper.cpp gk2_effectBase.cpp gk2_exceptions.cpp gk2_input.cpp gk2_lightShadowEffect.cpp gk2_mesh.cpp gk2_meshLoader.cpp gk2_phongEffect.cpp gk2_robot.cpp gk2_utils.cpp gk2_vertices.cpp gk2_window.cpp main.cpp WICTextureLoader.cpp
-         WICTextureLoader.cpp
-         main.cpp
-         gk2_window.cpp
-         gk2_vertices.cpp
-         gk2_utils.cpp
+﻿Build started 2016-05-07 12:50:53.
+     1>Project "C:\Users\Malgosia\Downloads\Robot\Robot\Robot\Robot.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Debug\\" /Fd"x64\Debug\vc140.pdb" /Gd /TP /errorReport:prompt gk2_robot.cpp
          gk2_robot.cpp
-         gk2_phongEffect.cpp
-         gk2_meshLoader.cpp
-         gk2_mesh.cpp
-         gk2_lightShadowEffect.cpp
-         gk2_input.cpp
-         gk2_exceptions.cpp
-         gk2_effectBase.cpp
-         gk2_deviceHelper.cpp
-         gk2_constantBuffer.cpp
-         gk2_camera.cpp
-         gk2_applicationBase.cpp
-         Generating Code...
+     1>c:\users\malgosia\downloads\robot\robot\robot\gk2_robot.cpp(251): warning C4305: 'argument': truncation from 'double' to 'float'
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Malgosia\Downloads\Robot\Robot\x64\Debug\Robot.exe" /INCREMENTAL /NOLOGO d3d11.lib dinput8.lib dxguid.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG:FASTLINK /PDB:"C:\Users\Malgosia\Downloads\Robot\Robot\x64\Debug\Robot.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Malgosia\Downloads\Robot\Robot\x64\Debug\Robot.lib" /MACHINE:X64 x64\Debug\gk2_applicationBase.obj
          x64\Debug\gk2_camera.obj
@@ -56,8 +23,8 @@
          x64\Debug\main.obj
          x64\Debug\WICTextureLoader.obj
          Robot.vcxproj -> C:\Users\Malgosia\Downloads\Robot\Robot\x64\Debug\Robot.exe
-     1>Done Building Project "C:\Users\Malgosia\Downloads\Robot\Robot\Robot\Robot.vcxproj" (Rebuild target(s)).
+     1>Done Building Project "C:\Users\Malgosia\Downloads\Robot\Robot\Robot\Robot.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:21.10
+Time Elapsed 00:00:02.27

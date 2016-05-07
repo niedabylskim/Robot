@@ -3,6 +3,11 @@ cbuffer cbSurfaceColor : register(b0)
 	float4 surfaceColor;
 }
 
+cbuffer cbAmbient : register(b1)
+{
+	float3 ambientColor;
+}
+
 struct PSInput
 {
 	float4 pos : SV_POSITION;
@@ -11,9 +16,9 @@ struct PSInput
 	float3 lightVec : TEXCOORD1;
 };
 
-static const float3 ambientColor = float3(0.2f, 0.2f, 0.2f);
-static const float3 lightColor = float3(1.0f, 1.0f, 1.0f);
-static const float3 kd = 0.5, ks = 0.2f, m = 100.0f;
+//static const float3 ambientColor = float3(0.3f, 0.3f, 0.3f);
+static const float3 lightColor = float3(1.0f, 0.4f, 0.0f);
+static const float3 kd = 0.1, ks = 0.2f, m = 100.0f;
 
 float4 main(PSInput i) : SV_TARGET
 {
@@ -22,9 +27,7 @@ float4 main(PSInput i) : SV_TARGET
 	float3 lightVec = normalize(i.lightVec);
 	float3 halfVec = normalize(viewVec + lightVec);
 	float3 color = surfaceColor.rgb * ambientColor;
-	color += lightColor * surfaceColor.rgb * kd * saturate(dot(normal, lightVec)) +
-		lightColor * ks * pow(saturate(dot(normal, halfVec)), m);
-	if (!surfaceColor.a)
-		discard;
+	color += lightColor * surfaceColor.rgb * kd * saturate(dot(normal, lightVec)) +	lightColor * ks * pow(saturate(dot(normal, halfVec)), m);
+	if (!surfaceColor.a) discard;
 	return float4(saturate(color), surfaceColor.a);
 }

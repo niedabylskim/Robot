@@ -10,12 +10,12 @@ namespace gk2
 	class MeshLoader
 	{
 	public:
-		explicit MeshLoader(const DeviceHelper& device): m_device(device) { }
+		explicit MeshLoader(const DeviceHelper& device) : m_device(device) { }
 		Mesh LoadMesh(const std::wstring& fileName);
 		Mesh GetQuad(float side);
 		Mesh GetDisc(int slices, float radius /* = 0.5f */);
 		Mesh GetSphere(int stacks, int slices, float radius /* = 0.5f */);
-
+		Mesh GetCylinder(int stacks, int slices, float radius /* = 0.5f */, float height /* = 1.0f */);
 	private:
 		DeviceHelper m_device;
 	};
