@@ -250,3 +250,11 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+*.cso
+.vs/Robot/v14/.suo
+*.obj
+*.tlog
+Robot/x64/Debug/Robot.log
+*.lastbuildstate
+Robot/x64/Debug/vc140.idb
+*.pdb
