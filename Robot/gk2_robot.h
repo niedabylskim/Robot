@@ -69,8 +69,8 @@ namespace gk2
 		std::shared_ptr<ID3D11InputLayout> m_layout;
 
 		std::shared_ptr<ID3D11RasterizerState> m_rsCullNone;
-		/*std::shared_ptr<ID3D11BlendState> m_bsAlpha;
-		std::shared_ptr<ID3D11DepthStencilState> m_dssNoWrite;*/
+		std::shared_ptr<ID3D11BlendState> m_bsAlpha;
+		std::shared_ptr<ID3D11DepthStencilState> m_dssNoWrite;
 
 		void InitializeConstantBuffers();
 		void InitializeCamera();
@@ -82,6 +82,7 @@ namespace gk2
 		void UpdateRobot();
 		void DrawMirroredWorld();
 		void DrawScene();
+		XMFLOAT3 GetDiscPos();
 	};
 }
 

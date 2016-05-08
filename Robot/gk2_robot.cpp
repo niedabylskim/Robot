@@ -90,8 +90,8 @@ void Robot::InitializeRenderStates()
 	auto rsDesc = m_device.DefaultRasterizerDesc();
 	rsDesc.CullMode = D3D11_CULL_BACK;
 	m_rsCullNone = m_device.CreateRasterizerState(rsDesc);
-
-	/*auto bsDesc = m_device.DefaultBlendDesc();
+	
+	auto bsDesc = m_device.DefaultBlendDesc();
 	bsDesc.RenderTarget[0].BlendEnable = true;
 	bsDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 	bsDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
@@ -100,7 +100,7 @@ void Robot::InitializeRenderStates()
 
 	auto dssDesc = m_device.DefaultDepthStencilDesc();
 	dssDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-	m_dssNoWrite = m_device.CreateDepthStencilState(dssDesc);*/
+	m_dssNoWrite = m_device.CreateDepthStencilState(dssDesc);
 }
 
 bool Robot::LoadContent()
@@ -122,6 +122,12 @@ bool Robot::LoadContent()
 	XMVECTOR v1 = XMVector3TransformCoord(v, XMMatrixRotationZ(-XM_PI / 4.0f)* XMMatrixTranslation(-1.50f, 0, 0));
 	XMStoreFloat3(&disk_normal, v1);
 	disk_normal.x = -disk_normal.x;
+
+	m_particles = make_shared<ParticleSystem>(m_device);
+	m_particles->SetViewMtxBuffer(m_viewCB);
+	m_particles->SetProjMtxBuffer(m_projCB);
+	m_particles->SetWorldMtxBuffer(m_worldCB);
+
 	return true;
 }
 
@@ -211,13 +217,29 @@ void Robot::Update(float dt)
 			UpdateCamera();
 	}
 	UpdateDiskPosition(dt);
-	UpdateRobot();
+	UpdateRobot(); 
+	XMFLOAT3 discPos = GetDiscPos();
+	discPos.z *= -1;
+	m_particles->Update(m_context, dt, m_camera.GetPosition(), discPos);
 }
 
 void Robot::UpdateRobot()
 {
 	float a1, a2, a3, a4, a5;
 	float l1 = .91f, l2 = .81f, l3 = .33f, dy = .27f, dz = -.26f;
+	
+	inverse_kinematics(GetDiscPos(), disk_normal, a1, a2, a3, a4, a5);
+
+	m_parts[0].setWorldMatrix(XMMatrixScaling(1, 1, -1));
+	m_parts[1].setWorldMatrix(XMMatrixRotationY(a1)*m_parts[0].getWorldMatrix());
+	m_parts[2].setWorldMatrix(XMMatrixTranslation(0, -dy, 0)* XMMatrixRotationZ(a2)*XMMatrixTranslation(0, +dy, 0)*m_parts[1].getWorldMatrix());
+	m_parts[3].setWorldMatrix(XMMatrixTranslation(l1, -dy, 0)*XMMatrixRotationZ(a3)*XMMatrixTranslation(-l1, dy, 0)*m_parts[2].getWorldMatrix());
+	m_parts[4].setWorldMatrix(XMMatrixTranslation(0, -dy, -dz)*XMMatrixRotationX(a4)*XMMatrixTranslation(0, dy, dz)*m_parts[3].getWorldMatrix());
+	m_parts[5].setWorldMatrix(XMMatrixTranslation(l1 + l2, -dy, 0)*XMMatrixRotationZ(a5)*XMMatrixTranslation(-(l1 + l2), dy, 0) *m_parts[4].getWorldMatrix());
+}
+
+XMFLOAT3 Robot::GetDiscPos()
+{
 	XMMATRIX m = XMMatrixTranslation(-1.50f, 0, 0);
 	XMFLOAT3 pos = XMFLOAT3(0, 0, 0);
 	XMVECTOR v = XMLoadFloat3(&pos);
@@ -230,15 +252,8 @@ void Robot::UpdateRobot()
 	XMStoreFloat3(&p, v1);
 	v1 = XMVector3TransformCoord(XMLoadFloat3(&pos), XMMatrixTranslation(p.x, p.y, p.z));
 	XMStoreFloat3(&pos, v1);
-	
-	inverse_kinematics(pos, disk_normal, a1, a2, a3, a4, a5);
 
-	m_parts[0].setWorldMatrix(XMMatrixScaling(1, 1, -1));
-	m_parts[1].setWorldMatrix(XMMatrixRotationY(a1)*m_parts[0].getWorldMatrix());
-	m_parts[2].setWorldMatrix(XMMatrixTranslation(0, -dy, 0)* XMMatrixRotationZ(a2)*XMMatrixTranslation(0, +dy, 0)*m_parts[1].getWorldMatrix());
-	m_parts[3].setWorldMatrix(XMMatrixTranslation(l1, -dy, 0)*XMMatrixRotationZ(a3)*XMMatrixTranslation(-l1, dy, 0)*m_parts[2].getWorldMatrix());
-	m_parts[4].setWorldMatrix(XMMatrixTranslation(0, -dy, -dz)*XMMatrixRotationX(a4)*XMMatrixTranslation(0, dy, dz)*m_parts[3].getWorldMatrix());
-	m_parts[5].setWorldMatrix(XMMatrixTranslation(l1 + l2, -dy, 0)*XMMatrixRotationZ(a5)*XMMatrixTranslation(-(l1 + l2), dy, 0) *m_parts[4].getWorldMatrix());
+	return pos;
 }
 
 void Robot::DrawScene()
@@ -273,6 +288,10 @@ void Robot::DrawScene()
 	m_context->RSSetState(nullptr);
 }
 
+void Robot::DrawMirroredWorld()
+{
+}
+
 void Robot::Render()
 {
 	if (m_context == nullptr) return;
@@ -284,9 +303,10 @@ void Robot::Render()
 	m_phongEffect->Begin(m_context);
 	DrawScene();
 	m_phongEffect->End();
+	m_context->OMSetBlendState(m_bsAlpha.get(), nullptr, BS_MASK);
+	m_context->OMSetDepthStencilState(m_dssNoWrite.get(), 0);
+	m_particles->Render(m_context);
+	m_context->OMSetDepthStencilState(nullptr, 0);
+	m_context->OMSetBlendState(nullptr, nullptr, BS_MASK);
 	m_swapChain->Present(0, 0);
-}
-
-void Robot::DrawMirroredWorld()
-{
 }

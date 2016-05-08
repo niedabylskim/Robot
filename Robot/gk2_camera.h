@@ -13,6 +13,7 @@ namespace gk2
 		void GetViewMatrix(DirectX::XMMATRIX& viewMatrix) const;
 		void Rotate(float dx, float dy);
 		void Move(XMFLOAT3 v);
+		XMFLOAT4 GetPosition() const;
 	private:
 		float m_angleX;
 		float m_angleY;

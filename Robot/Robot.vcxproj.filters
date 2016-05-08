@@ -87,6 +87,9 @@
     <ClCompile Include="gk2_robot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gk2_particles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gk2_applicationBase.h">
@@ -135,6 +138,9 @@
       <Filter>Header Files\effects</Filter>
     </ClInclude>
     <ClInclude Include="gk2_robot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gk2_particles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

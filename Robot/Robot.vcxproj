@@ -129,6 +129,7 @@
     <ClCompile Include="gk2_lightShadowEffect.cpp" />
     <ClCompile Include="gk2_mesh.cpp" />
     <ClCompile Include="gk2_meshLoader.cpp" />
+    <ClCompile Include="gk2_particles.cpp" />
     <ClCompile Include="gk2_phongEffect.cpp" />
     <ClCompile Include="gk2_robot.cpp" />
     <ClCompile Include="gk2_utils.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="gk2_lightShadowEffect.h" />
     <ClInclude Include="gk2_mesh.h" />
     <ClInclude Include="gk2_meshLoader.h" />
+    <ClInclude Include="gk2_particles.h" />
     <ClInclude Include="gk2_phongEffect.h" />
     <ClInclude Include="gk2_robot.h" />
     <ClInclude Include="gk2_utils.h" />
