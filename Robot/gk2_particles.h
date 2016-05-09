@@ -58,7 +58,7 @@ namespace gk2
 		void SetProjMtxBuffer(const std::shared_ptr<CBMatrix>& proj);
 		void SetWorldMtxBuffer(const std::shared_ptr<CBMatrix>& world);
 
-		void Update(std::shared_ptr<ID3D11DeviceContext>& context, float dt, DirectX::XMFLOAT4 cameraPos, DirectX::XMFLOAT3 particlePos);
+		void Update(std::shared_ptr<ID3D11DeviceContext>& context, float dt, DirectX::XMFLOAT4 cameraPos, DirectX::XMFLOAT3 startPos);
 		void Render(std::shared_ptr<ID3D11DeviceContext>& context) const;
 
 	private:

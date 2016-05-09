@@ -244,9 +244,18 @@ Mesh MeshLoader::LoadMesh(const wstring& fileName)
 		input >> indices[i + 2];
 		input >> indices[i + 1];
 		input >> indices[i];
-		
+
 	}
+
+	input >> n;
+	vector<vector<int>> edges(n);
+	for (auto i = 0; i < n; i++)
+	{
+		edges[i] = vector<int>(4);
+		input >> edges[i][0] >> edges[i][1] >> edges[i][2] >> edges[i][3];
+	}
+
 	input.close();
 	return Mesh(m_device.CreateVertexBuffer(vertices), sizeof(VertexPosNormal),
-		m_device.CreateIndexBuffer(indices), 3 * n);
+		m_device.CreateIndexBuffer(indices), indices.size(), vertices, indices, edges);
 }

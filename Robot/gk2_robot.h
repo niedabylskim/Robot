@@ -28,15 +28,12 @@ namespace gk2
 		void Render() override;
 
 	private:
-		static const float TABLE_H;
-		static const float TABLE_TOP_H;
-		static const float TABLE_R;
 		static const float DISK_R;
-		static const DirectX::XMFLOAT4 TABLE_POS;
 		static const unsigned int BS_MASK;
 		/*static const unsigned int VB_STRIDE;
 		static const unsigned int VB_OFFSET;*/
 		Mesh m_parts[6];
+		Mesh m_shadowParts[6];
 		Mesh m_ground;
 		Mesh m_plateRight;
 		Mesh m_plateLeft;
@@ -69,9 +66,21 @@ namespace gk2
 		std::shared_ptr<ParticleSystem> m_particles;
 		std::shared_ptr<ID3D11InputLayout> m_layout;
 
+		std::shared_ptr<ID3D11RasterizerState> m_rsCullNone2;
+		std::shared_ptr<ID3D11BlendState> m_bsAlpha2;
+		std::shared_ptr<ID3D11DepthStencilState> m_dssNoWrite2;
+
+		std::shared_ptr<ID3D11RasterizerState> m_rsCullFront;
 		std::shared_ptr<ID3D11RasterizerState> m_rsCullNone;
+		std::shared_ptr<ID3D11RasterizerState> m_rsCullBack;
 		std::shared_ptr<ID3D11BlendState> m_bsAlpha;
+		std::shared_ptr<ID3D11BlendState> m_bsNoDraw;
+		std::shared_ptr<ID3D11BlendState> m_bsDraw;
 		std::shared_ptr<ID3D11DepthStencilState> m_dssNoWrite;
+		std::shared_ptr<ID3D11DepthStencilState> m_dssStencilIncr;
+		std::shared_ptr<ID3D11DepthStencilState> m_dssStencilDecr;
+		std::shared_ptr<ID3D11DepthStencilState> m_dssStencilTest;
+		std::shared_ptr<ID3D11DepthStencilState> tmp;
 
 		void InitializeConstantBuffers();
 		void InitializeCamera();
@@ -86,11 +95,17 @@ namespace gk2
 		void DrawPlateRight();
 		void DrawPlateLeft();
 		void DrawGround();
+		void DrawGroundAlpha();
 		void DrawScene();
 		void DrawDisk();
 		void DrawCylinder();
 		void DrawRobot();
 		void SetLight();
+
+		void DrawSceneElements(DirectX::XMFLOAT4 ambient);
+		void DrawSceneElements2(DirectX::XMFLOAT4 ambient);
+		void GetShadowMeshes();
+		void DrawShadows();
 		XMFLOAT3 GetDiscPos();
 	};
 }

@@ -79,26 +79,52 @@ void Robot::CreateScene()
 	m_disk = loader.GetDisc(50, 0.02f);
 	m_disk.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2 + DISK_ROTATION) * XMMatrixTranslation(DISK_POSITION, 0.0f, 0.0f));
 	m_lidCyl1 = loader.GetDisc(50, 0.5f);
-	m_lidCyl1.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2) * XMMatrixTranslation(-lightPosition.x-0.75f, -0.5f, 2.0f));
+	m_lidCyl1.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2) * XMMatrixTranslation(-lightPosition.x/3-0.75f, -0.5f, 2.0f));
 	m_lidCyl2 = loader.GetDisc(50, 0.5f);
-	m_lidCyl2.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2) * XMMatrixTranslation(-lightPosition.x + 0.75f, -0.5f, 2.0f));
+	m_lidCyl2.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2) * XMMatrixTranslation(-lightPosition.x/3 + 0.75f, -0.5f, 2.0f));
 	m_cylinder = loader.GetCylinder(50, 50, 0.5f, 1.5f);
-	m_cylinder.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2)* XMMatrixTranslation(-lightPosition.x, -0.5f, 2.0f));
+	m_cylinder.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2)* XMMatrixTranslation(-lightPosition.x/3, -0.5f, 2.0f));
 }
 
 void Robot::InitializeRenderStates()
 {
 	auto rsDesc = m_device.DefaultRasterizerDesc();
 	rsDesc.CullMode = D3D11_CULL_BACK;
-	m_rsCullNone = m_device.CreateRasterizerState(rsDesc);
+	m_rsCullBack = m_device.CreateRasterizerState(rsDesc);
 	
+	rsDesc = m_device.DefaultRasterizerDesc();
+	rsDesc.CullMode = D3D11_CULL_NONE;
+	m_rsCullNone = m_device.CreateRasterizerState(rsDesc);
+
+	rsDesc.CullMode = D3D11_CULL_FRONT;
+	m_rsCullFront = m_device.CreateRasterizerState(rsDesc);
+
 	auto bsDesc = m_device.DefaultBlendDesc();
 	bsDesc.RenderTarget[0].BlendEnable = true;
 	bsDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 	bsDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 	bsDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
 	bsDesc.RenderTarget[0].RenderTargetWriteMask = 0x0f;
+	m_bsAlpha2 = m_device.CreateBlendState(bsDesc);
+
+	bsDesc = m_device.DefaultBlendDesc();
+	bsDesc.RenderTarget[0].BlendEnable = true;
+	bsDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	bsDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
+	bsDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
 	m_bsAlpha = m_device.CreateBlendState(bsDesc);
+	bsDesc.RenderTarget[0].BlendEnable = true;
+	bsDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ZERO;
+	bsDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	bsDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	m_bsNoDraw = m_device.CreateBlendState(bsDesc);
+
+	bsDesc.RenderTarget[0].BlendEnable = true;
+	bsDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	bsDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
+	bsDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	bsDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	m_bsDraw = m_device.CreateBlendState(bsDesc);
 
 	auto dssDesc = m_device.DefaultDepthStencilDesc();
 	dssDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
@@ -118,10 +144,49 @@ void Robot::InitializeRenderStates()
 	dssDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	m_dssTest = m_device.CreateDepthStencilState(dssDesc);
 
+
 	rsDesc = m_device.DefaultRasterizerDesc();
 	//Set rasterizer state front face to ccw
 	rsDesc.FrontCounterClockwise = true;
 	m_rsCounterClockwise = m_device.CreateRasterizerState(rsDesc);
+
+	dssDesc.DepthEnable = true;
+	dssDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	dssDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	dssDesc.StencilEnable = true;
+	dssDesc.StencilWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dssDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	dssDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_INCR;
+	dssDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+
+	m_dssStencilIncr = m_device.CreateDepthStencilState(dssDesc);
+
+
+	dssDesc = m_device.DefaultDepthStencilDesc();
+	dssDesc.DepthEnable = true;
+	dssDesc.StencilEnable = false;
+	dssDesc.StencilWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	tmp = m_device.CreateDepthStencilState(dssDesc);
+
+	dssDesc.DepthEnable = true;
+	dssDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	dssDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	dssDesc.StencilEnable = true;
+	dssDesc.StencilWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dssDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	dssDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_DECR;
+	dssDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	m_dssStencilDecr = m_device.CreateDepthStencilState(dssDesc);
+
+	dssDesc.DepthEnable = true;
+	dssDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dssDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	dssDesc.StencilEnable = true;
+	dssDesc.StencilWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	dssDesc.FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL;
+	dssDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dssDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	m_dssStencilTest = m_device.CreateDepthStencilState(dssDesc);
 }
 
 bool Robot::LoadContent()
@@ -144,7 +209,7 @@ bool Robot::LoadContent()
 	XMStoreFloat3(&disk_normal, v1);
 	disk_normal.x = -disk_normal.x;
 
-	m_particles = make_shared<ParticleSystem>(m_device, DISK_ROTATION - XM_PIDIV4);
+	m_particles = make_shared<ParticleSystem>(m_device, DISK_ROTATION + XM_PIDIV4 - XM_PIDIV2);
 	m_particles->SetViewMtxBuffer(m_viewCB);
 	m_particles->SetProjMtxBuffer(m_projCB);
 	m_particles->SetWorldMtxBuffer(m_worldCB);
@@ -305,6 +370,13 @@ void Robot::DrawGround()
 	m_ground.Render(m_context);
 }
 
+void Robot::DrawGroundAlpha()
+{
+	m_surfaceColorCB->Update(m_context, XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f));
+	m_worldCB->Update(m_context, m_ground.getWorldMatrix());
+	m_ground.Render(m_context);
+}
+
 void Robot::DrawDisk()
 {
 	m_surfaceColorCB->Update(m_context, XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f));
@@ -332,6 +404,39 @@ void Robot::DrawRobot()
 	}
 }
 
+void Robot::DrawSceneElements(DirectX::XMFLOAT4 ambient)
+{
+	m_surfaceColorCB->Update(m_context, XMFLOAT4(1.0f, 0.4f, 0.0f, 1.0f));
+	m_lightAmbient->Update(m_context, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+	m_worldCB->Update(m_context, m_light.getWorldMatrix());
+	m_light.Render(m_context);
+	m_surfaceColorCB->Update(m_context, XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_lightAmbient->Update(m_context, ambient);
+
+	m_context->OMSetDepthStencilState(m_dssTest.get(), 0);
+	DrawGround();
+	m_context->OMSetDepthStencilState(tmp.get(), 0);
+	DrawRobot();
+	DrawDisk();
+	DrawCylinder();
+}
+
+void Robot::DrawSceneElements2(DirectX::XMFLOAT4 ambient)
+{
+	m_surfaceColorCB->Update(m_context, XMFLOAT4(1.0f, 0.4f, 0.0f, 1.0f));
+	m_lightAmbient->Update(m_context, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+	m_worldCB->Update(m_context, m_light.getWorldMatrix());
+	m_light.Render(m_context);
+	m_surfaceColorCB->Update(m_context, XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	m_lightAmbient->Update(m_context, ambient);
+	
+	
+	DrawGround();
+	DrawRobot();
+	DrawDisk();
+	DrawCylinder();
+}
+
 void Robot::SetLight()
 {
 	m_lightAmbient->Update(m_context, XMFLOAT4(1, 1, 1, 1));
@@ -340,19 +445,22 @@ void Robot::SetLight()
 	m_lightAmbient->Update(m_context, XMFLOAT4(0.2, 0.2, 0.2, 1));
 }
 
-void Robot::DrawScene()
+void Robot::DrawShadows()
 {
-	m_context->RSSetState(m_rsCullNone.get());
-	m_surfaceColorCB->Update(m_context, XMFLOAT4(1.0f, 0.4f, 0.0f, 1.0f));
-	SetLight();
-	
-	DrawRobot();
-	DrawGround();
-	//DrawPlate();
-	DrawDisk();
-	DrawCylinder();
-	
-	m_context->RSSetState(nullptr);
+	m_surfaceColorCB->Update(m_context, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+	for (int i = 0; i < 6; i++)
+	{
+		m_worldCB->Update(m_context, m_parts[i].getWorldMatrix());
+		m_shadowParts[i].Render(m_context);
+	}
+}
+
+void Robot::GetShadowMeshes()
+{
+	for (int i = 0; i < 6; i++)
+	{
+		m_shadowParts[i] = m_parts[i].BuildShadowVolume(m_device, lightPosition);
+	}
 }
 
 void Robot::DrawMirroredWorld()
@@ -375,8 +483,9 @@ void Robot::DrawMirroredWorld()
 	DrawDisk();
 	DrawCylinder();
 	m_phongEffect->End();
+
 	m_phongEffect->Begin(m_context);
-	m_context->OMSetBlendState(m_bsAlpha.get(), nullptr, BS_MASK);
+	m_context->OMSetBlendState(m_bsAlpha2.get(), nullptr, BS_MASK);
 	m_particles->Render(m_context);
 	m_context->OMSetBlendState(nullptr, nullptr, BS_MASK);
 	m_phongEffect->End();
@@ -384,6 +493,54 @@ void Robot::DrawMirroredWorld()
 
 	m_context->RSSetState(nullptr);
 	m_context->OMSetDepthStencilState(nullptr, 0);
+}
+
+void Robot::DrawScene()
+{
+	float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	UINT sampleMask = 0xffffffff;
+	GetShadowMeshes();
+
+	m_phongEffect->Begin(m_context);
+	DrawSceneElements(XMFLOAT4(0.05f, 0.05f, 0.05f, 1.0f));
+	m_phongEffect->End();
+	
+	m_context->RSSetState(m_rsCullBack.get());
+
+	//// inkrementacja bufora szablonu
+	m_context->OMSetDepthStencilState(m_dssStencilIncr.get(), 0);
+
+	//// wy³¹czenie rysowania
+	m_context->OMSetBlendState(m_bsNoDraw.get(), blendFactor, sampleMask);
+
+	// renderowanie bry³ cieni
+	DrawShadows();
+
+	// renderowanie œcian tylnych
+	m_context->RSSetState(m_rsCullFront.get());
+
+	// dekrementacja bufora szablonu
+	m_context->OMSetDepthStencilState(m_dssStencilDecr.get(), 0);
+
+	// renderowanie bry³ cieni
+	DrawShadows();
+
+	// czyszczenie z-bufora
+	m_context->ClearDepthStencilView(m_depthStencilView.get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+	// rysowanie przednich œcian
+	m_context->RSSetState(m_rsCullBack.get());
+
+	// w³¹czenie rysowania
+	m_context->OMSetBlendState(m_bsAlpha.get(), blendFactor, sampleMask);
+
+	// test bufora szablonu
+	m_context->OMSetDepthStencilState(m_dssStencilTest.get(), 0);
+
+	// renderowanie z oœwietleniem
+	m_phongEffect->Begin(m_context);
+	DrawSceneElements2(XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f));
+	m_phongEffect->End();
 }
 
 void Robot::Render()
@@ -394,27 +551,26 @@ void Robot::Render()
 	m_context->ClearRenderTargetView(m_backBuffer.get(), clearColor);
 	m_context->ClearDepthStencilView(m_depthStencilView.get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	m_projCB->Update(m_context, m_projMtx);
-	SetLight();
+	//SetLight();
 
 	DrawMirroredWorld();
-
-	m_phongEffect->Begin(m_context);
+	//m_phongEffect->Begin(m_context);
 	DrawScene();
-	m_phongEffect->End();
+	//m_phongEffect->End();
 
-	m_context->OMSetBlendState(m_bsAlpha.get(), nullptr, BS_MASK);
+	m_context->OMSetBlendState(m_bsAlpha2.get(), nullptr, BS_MASK);
 	m_context->OMSetDepthStencilState(m_dssNoWrite.get(), 0);
 	m_particles->Render(m_context);
 	m_context->OMSetDepthStencilState(nullptr, 0);
 	m_context->OMSetBlendState(nullptr, nullptr, BS_MASK);
 
-	m_phongEffect->Begin(m_context);	
-	m_context->OMSetBlendState(m_bsAlpha.get(), nullptr, BS_MASK);
+	m_phongEffect->Begin(m_context);
+	m_context->OMSetBlendState(m_bsAlpha2.get(), nullptr, BS_MASK);
 	m_surfaceColorCB->Update(m_context, XMFLOAT4(1.0f, 1.0f, 1.0f, 0.5f));
 	DrawPlateRight();
 	DrawPlateLeft();
 	m_context->OMSetBlendState(nullptr, nullptr, BS_MASK);
 	m_phongEffect->End();
-	
+
 	m_swapChain->Present(0, 0);
 }

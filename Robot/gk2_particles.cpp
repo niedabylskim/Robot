@@ -34,8 +34,8 @@ const XMFLOAT3 ParticleSystem::EMITTER_DIR = XMFLOAT3(1.0f, 0.0f, 0.0f);
 const float ParticleSystem::TIME_TO_LIVE = 1.0f;
 const float ParticleSystem::EMISSION_RATE = 1000.0f;
 //const float ParticleSystem::MAX_ANGLE = XM_PIDIV2;
-const float ParticleSystem::MIN_VELOCITY = 0.9f;
-const float ParticleSystem::MAX_VELOCITY = .9f;
+const float ParticleSystem::MIN_VELOCITY = 0.8f;
+const float ParticleSystem::MAX_VELOCITY = 0.9f;
 const float ParticleSystem::PARTICLE_SIZE = 0.08f;
 const float ParticleSystem::PARTICLE_SCALE = 0.1f;
 const float ParticleSystem::MIN_ANGLE_VEL = -XM_PIDIV2;
@@ -58,7 +58,7 @@ ParticleSystem::ParticleSystem(DeviceHelper& device, float maxAngle)
 	m_gs = device.CreateGeometryShader(gsByteCode);
 	m_ps = device.CreatePixelShader(psByteCode);
 	m_layout = device.CreateInputLayout<ParticleVertex>(vsByteCode);
-	m_cloudTexture = device.CreateShaderResourceView(L"resources/textures/spark_texture.png");
+	m_cloudTexture = device.CreateShaderResourceView(L"resources/textures/spark_paint.png");
 	m_opacityTexture = device.CreateShaderResourceView(L"resources/textures/smokecolors.png");
 	auto sd = device.DefaultSamplerDesc();
 	sd.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -94,12 +94,10 @@ XMFLOAT3 ParticleSystem::RandomVelocity(XMFLOAT3 startPos)
 		z = m_dirCoordDist(m_random);
 	} while (x*x + y*y + z*z > 1.0f);
 	x = m_dirCoordDist(m_random);
-	if (x < 0) x *= -1;
-	if (x < 0 || x > 1)
-		int yyoyoyo = 0;
+	/*if (x < 0) x *= -1;
 	srand(time(NULL) * m_particlesToCreate);
 	int i = rand() % 2;
-	if (i == 0) i--;
+	if (i == 0) i--;*/
 	z = rand() % 10 + 2;
 	float a = tan(m_angle(m_random));
 	XMFLOAT3 v(z, z * a, y * 20);

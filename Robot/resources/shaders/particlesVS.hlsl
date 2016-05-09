@@ -34,7 +34,7 @@ GSInput main(VSInput i)
     o.pos = float4(i.pos, 1.0f);
     o.pos = mul(viewMatrix, o.pos);
     o.previousPos = float4(i.previousPos, 1.0f);
-    o.previousPos.xyz -= 0.01f;
+    //o.previousPos.xyz -= 0.01f;
     o.previousPos = mul(viewMatrix, o.previousPos);
     o.age = i.age;
     o.angle = i.angle;

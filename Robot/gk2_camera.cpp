@@ -40,14 +40,6 @@ void Camera::Move(XMFLOAT3 v)
 
 XMFLOAT4 Camera::GetPosition() const
 {
-	XMMATRIX viewMtx;
-	GetViewMatrix(viewMtx);
-	XMVECTOR det;
-	viewMtx = XMMatrixInverse(&det, viewMtx);
-	//auto alt = XMMatrixTranslation(0.0f, 0.0f, -m_distance) * XMMatrixRotationY(m_angleY) * XMMatrixRotationX(-m_angleX);
-	XMFLOAT3 res(0.0f, 0.0f, 0.0f);
-	auto transl = XMVector3TransformCoord(XMLoadFloat3(&res), viewMtx);
-	XMStoreFloat3(&res, transl);
-	return XMFLOAT4(res.x, res.y, res.z, 1.0f);
+	return m_position;
 }
 
