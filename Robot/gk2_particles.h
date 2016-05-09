@@ -73,7 +73,7 @@ namespace gk2
 		static const float MIN_ANGLE_VEL;	//minimal rotation speed
 		static const float MAX_ANGLE_VEL;	//maximal rotation speed
 		static const int MAX_PARTICLES;		//maximal number of particles in the system
-
+		
 		static const unsigned int OFFSET;
 		static const unsigned int STRIDE;
 
@@ -103,7 +103,7 @@ namespace gk2
 		std::uniform_real_distribution<float> m_angleVelDist;
 		std::uniform_real_distribution<float> m_angle;
 
-		DirectX::XMFLOAT3 RandomVelocity();
+		DirectX::XMFLOAT3 RandomVelocity(DirectX::XMFLOAT3 startPos);
 		void AddNewParticle(DirectX::XMFLOAT3 startPos);
 		static void UpdateParticle(Particle& p, float dt);
 		void UpdateVertexBuffer(std::shared_ptr<ID3D11DeviceContext>& context, DirectX::XMFLOAT4 cameraPos);

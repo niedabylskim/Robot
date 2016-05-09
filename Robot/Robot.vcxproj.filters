@@ -187,4 +187,9 @@
       <Filter>Resource Files\shaders</Filter>
     </FxCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\textures\spark_texture.png">
+      <Filter>Resource Files\textures</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

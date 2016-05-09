@@ -38,7 +38,8 @@ namespace gk2
 		static const unsigned int VB_OFFSET;*/
 		Mesh m_parts[6];
 		Mesh m_ground;
-		Mesh m_plate;
+		Mesh m_plateRight;
+		Mesh m_plateLeft;
 		Mesh m_disk;
 		Mesh m_light;
 		Mesh m_cylinder;
@@ -62,7 +63,7 @@ namespace gk2
 		std::shared_ptr<ConstantBuffer<DirectX::XMFLOAT4>> m_lightAmbient;
 		std::shared_ptr<ID3D11DepthStencilState> m_dssWrite;
 		std::shared_ptr<ID3D11DepthStencilState> m_dssTest;
-		std::shared_ptr<ID3D11DepthStencilState> m_rsCounterClockwise;
+		std::shared_ptr<ID3D11RasterizerState> m_rsCounterClockwise;
 		std::shared_ptr<PhongEffect> m_phongEffect;
 		std::shared_ptr<LightShadowEffect> m_lightShadowEffect;
 		std::shared_ptr<ParticleSystem> m_particles;
@@ -77,11 +78,19 @@ namespace gk2
 		void InitializeRenderStates();
 		void CreateScene();
 		void UpdateCamera();
+		void UpdateCamera(const XMMATRIX& view) const;
 		void UpdateDiskPosition(float dt);
 		void inverse_kinematics(XMFLOAT3 pos, XMFLOAT3 normal, float &a1, float &a2, float &a3, float &a4, float &a5);
 		void UpdateRobot();
 		void DrawMirroredWorld();
+		void DrawPlateRight();
+		void DrawPlateLeft();
+		void DrawGround();
 		void DrawScene();
+		void DrawDisk();
+		void DrawCylinder();
+		void DrawRobot();
+		void SetLight();
 		XMFLOAT3 GetDiscPos();
 	};
 }

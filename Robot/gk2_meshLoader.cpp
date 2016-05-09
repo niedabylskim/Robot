@@ -136,9 +136,39 @@ Mesh MeshLoader::GetQuad(float side /* = 1.0f */)
 		{ XMFLOAT3(side, 0.0f, side), XMFLOAT3(0.0f, 1.0f, 0.0f) },
 		{ XMFLOAT3(side, 0.0f, -side), XMFLOAT3(0.0f, 1.0f, 0.0f) }
 	};
-	unsigned short indices[] = { 0, 2, 3, 0, 1, 2, 3,1,0, 3, 2, 1 };
+	unsigned short indices[] = { 0, 2, 3, 0, 1, 2, 3, 1, 0, 3, 2, 1 };
 	return Mesh(m_device.CreateVertexBuffer(vertices, 8), sizeof(VertexPosNormal),
 		m_device.CreateIndexBuffer(indices, 12), 12);
+}
+
+Mesh MeshLoader::GetRightSideQuad(float side /* = 1.0f */)
+{
+	side *= 5;
+	VertexPosNormal vertices[] =
+	{
+		{ XMFLOAT3(-side, 0.0f, -side), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+		{ XMFLOAT3(-side, 0.0f, side), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+		{ XMFLOAT3(side, 0.0f, side), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+		{ XMFLOAT3(side, 0.0f, -side), XMFLOAT3(0.0f, 1.0f, 0.0f) }
+	};
+	unsigned short indices[] = {3,1,0, 3, 2, 1 };
+	return Mesh(m_device.CreateVertexBuffer(vertices, 4), sizeof(VertexPosNormal),
+		m_device.CreateIndexBuffer(indices, 6), 6);
+}
+
+Mesh MeshLoader::GetLeftSideQuad(float side /* = 1.0f */)
+{
+	side *= 5;
+	VertexPosNormal vertices[] =
+	{
+		{ XMFLOAT3(-side, 0.0f, -side), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+		{ XMFLOAT3(-side, 0.0f, side), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+		{ XMFLOAT3(side, 0.0f, side), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+		{ XMFLOAT3(side, 0.0f, -side), XMFLOAT3(0.0f, 1.0f, 0.0f) }
+	};
+	unsigned short indices[] = { 0, 2, 3, 0, 1, 2 };
+	return Mesh(m_device.CreateVertexBuffer(vertices, 4), sizeof(VertexPosNormal),
+		m_device.CreateIndexBuffer(indices, 6), 6);
 }
 
 Mesh MeshLoader::GetDisc(int slices, float radius /* = 0.5f */)

@@ -32,7 +32,7 @@ void main(point GSInput inArray[1], inout TriangleStream<PSInput> ostream)
 
     o.pos = i.pos;
     o.pos = mul(projMatrix, o.pos);
-    o.tex1 = float2(0.0f, 1.0f);
+    o.tex1 = float2(1.0f, 1.0f);
     ostream.Append(o);
 
     o.pos = i.previousPos;

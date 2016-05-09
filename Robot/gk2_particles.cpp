@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include "gk2_exceptions.h"
+#include <time.h>   
 
 using namespace std;
 using namespace gk2;
@@ -43,6 +44,7 @@ const int ParticleSystem::MAX_PARTICLES = 1000;
 
 const unsigned int ParticleSystem::STRIDE = sizeof(ParticleVertex);
 const unsigned int ParticleSystem::OFFSET = 0;
+const float DISK_POSITION = -1.51f;
 
 ParticleSystem::ParticleSystem(DeviceHelper& device)
 	: m_particlesToCreate(0.0f), m_particlesCount(0), m_dirCoordDist(-1.0f, 1.0f),
@@ -56,7 +58,7 @@ ParticleSystem::ParticleSystem(DeviceHelper& device)
 	m_gs = device.CreateGeometryShader(gsByteCode);
 	m_ps = device.CreatePixelShader(psByteCode);
 	m_layout = device.CreateInputLayout<ParticleVertex>(vsByteCode);
-	m_cloudTexture = device.CreateShaderResourceView(L"resources/textures/smoke.png");
+	m_cloudTexture = device.CreateShaderResourceView(L"resources/textures/spark_texture.png");
 	m_opacityTexture = device.CreateShaderResourceView(L"resources/textures/smokecolors.png");
 	auto sd = device.DefaultSamplerDesc();
 	sd.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -82,7 +84,7 @@ void ParticleSystem::SetWorldMtxBuffer(const shared_ptr<CBMatrix>& world)
 		m_worldCB = world;
 }
 
-XMFLOAT3 ParticleSystem::RandomVelocity()
+XMFLOAT3 ParticleSystem::RandomVelocity(XMFLOAT3 startPos)
 {
 	float x, y, z;
 	do
@@ -92,8 +94,15 @@ XMFLOAT3 ParticleSystem::RandomVelocity()
 		z = m_dirCoordDist(m_random);
 	} while (x*x + y*y + z*z > 1.0f);
 	x = m_dirCoordDist(m_random);
+	if (x < 0) x *= -1;
+	if (x < 0 || x > 1)
+		int yyoyoyo = 0;
+	/*srand(time(NULL) * m_particlesToCreate);
+	int i = rand() % 2;
+	if (i == 0) i--;
+	z = rand() % 10 +2 ;*/
 	auto a = tan(MAX_ANGLE);
-	XMFLOAT3 v(x * a > 0 ? x*a : -x*a, (0.7 - x) * a, z * a);
+	XMFLOAT3 v(x * a > 0 ? x*a : -x*a, (1 - x) * a, z * a);
 	auto velocity = XMLoadFloat3(&v);
 	auto len = m_velDist(m_random);
 	velocity = len * XMVector3Normalize(velocity);
@@ -105,12 +114,12 @@ void ParticleSystem::AddNewParticle(XMFLOAT3 startPos)
 {
 	Particle p;
 	startPos.x += 0.01f;
-	p.Vertex.Pos = startPos;
-	p.Vertex.PreviousPos = startPos;
+	p.Vertex.Pos = startPos;// XMFLOAT3(DISK_POSITION, 0, 0);
+	p.Vertex.PreviousPos = startPos;// XMFLOAT3(DISK_POSITION, 0, 0);
 	p.Vertex.Age = 0.0f;
 	p.Vertex.Angle = 0.0f;
 	p.Vertex.Size = PARTICLE_SIZE;
-	p.Velocities.Velocity = RandomVelocity();
+	p.Velocities.Velocity = RandomVelocity(startPos);
 	p.Velocities.AngleVelocity = m_angleVelDist(m_random);
 	m_particles.push_back(p);
 }
@@ -196,10 +205,13 @@ void ParticleSystem::Render(shared_ptr<ID3D11DeviceContext>& context) const
 	context->GSSetShader(m_gs.get(), nullptr, 0);
 	context->PSSetShader(m_ps.get(), nullptr, 0);
 	context->IASetInputLayout(m_layout.get());
+	
 	ID3D11Buffer* vsb[2] = { m_viewCB->getBufferObject().get(), m_worldCB->getBufferObject().get() };
 	context->VSSetConstantBuffers(0, 1, vsb);
+	
 	ID3D11Buffer* gsb[1] = { m_projCB->getBufferObject().get() };
 	context->GSSetConstantBuffers(0, 1, gsb);
+	
 	ID3D11ShaderResourceView* psv[2] = { m_cloudTexture.get(), m_opacityTexture.get() };
 	context->PSSetShaderResources(0, 2, psv);
 	ID3D11SamplerState* pss[1] = { m_samplerState.get() };
