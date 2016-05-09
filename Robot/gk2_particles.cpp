@@ -32,23 +32,23 @@ bool ParticleComparer::operator()(const ParticleVertex& p1, const ParticleVertex
 
 const XMFLOAT3 ParticleSystem::EMITTER_DIR = XMFLOAT3(1.0f, 0.0f, 0.0f);
 const float ParticleSystem::TIME_TO_LIVE = 1.0f;
-const float ParticleSystem::EMISSION_RATE = 100.0f;
-const float ParticleSystem::MAX_ANGLE = XM_PIDIV2;
+const float ParticleSystem::EMISSION_RATE = 1000.0f;
+//const float ParticleSystem::MAX_ANGLE = XM_PIDIV2;
 const float ParticleSystem::MIN_VELOCITY = 0.9f;
 const float ParticleSystem::MAX_VELOCITY = .9f;
 const float ParticleSystem::PARTICLE_SIZE = 0.08f;
 const float ParticleSystem::PARTICLE_SCALE = 0.1f;
 const float ParticleSystem::MIN_ANGLE_VEL = -XM_PIDIV2;
 const float ParticleSystem::MAX_ANGLE_VEL = XM_PIDIV2;
-const int ParticleSystem::MAX_PARTICLES = 1000;
+const int ParticleSystem::MAX_PARTICLES = 10000;
 
 const unsigned int ParticleSystem::STRIDE = sizeof(ParticleVertex);
 const unsigned int ParticleSystem::OFFSET = 0;
 const float DISK_POSITION = -1.51f;
 
-ParticleSystem::ParticleSystem(DeviceHelper& device)
+ParticleSystem::ParticleSystem(DeviceHelper& device, float maxAngle)
 	: m_particlesToCreate(0.0f), m_particlesCount(0), m_dirCoordDist(-1.0f, 1.0f),
-	m_velDist(MIN_VELOCITY, MAX_VELOCITY), m_angleVelDist(MIN_ANGLE_VEL, MAX_ANGLE_VEL), m_angle(-MAX_ANGLE, MAX_ANGLE)
+	m_velDist(MIN_VELOCITY, MAX_VELOCITY), m_angleVelDist(MIN_ANGLE_VEL, MAX_ANGLE_VEL), m_angle(maxAngle - XM_PIDIV2, maxAngle), MAX_ANGLE(maxAngle)
 {
 	m_vertices = device.CreateVertexBuffer<ParticleVertex>(MAX_PARTICLES, D3D11_USAGE_DYNAMIC);
 	auto vsByteCode = device.LoadByteCode(L"particlesVS.cso");
@@ -97,12 +97,14 @@ XMFLOAT3 ParticleSystem::RandomVelocity(XMFLOAT3 startPos)
 	if (x < 0) x *= -1;
 	if (x < 0 || x > 1)
 		int yyoyoyo = 0;
-	/*srand(time(NULL) * m_particlesToCreate);
+	srand(time(NULL) * m_particlesToCreate);
 	int i = rand() % 2;
 	if (i == 0) i--;
-	z = rand() % 10 +2 ;*/
-	auto a = tan(MAX_ANGLE);
-	XMFLOAT3 v(x * a > 0 ? x*a : -x*a, (1 - x) * a, z * a);
+	z = rand() % 10 + 2;
+	float a = tan(m_angle(m_random));
+	XMFLOAT3 v(z, z * a, y * 20);
+	/*auto a = tan(XM_PIDIV2);
+	XMFLOAT3 v(x * a > 0 ? x*a : -x*a, (1 - x) * a, z * a);*/
 	auto velocity = XMLoadFloat3(&v);
 	auto len = m_velDist(m_random);
 	velocity = len * XMVector3Normalize(velocity);

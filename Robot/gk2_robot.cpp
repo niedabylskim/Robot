@@ -144,7 +144,7 @@ bool Robot::LoadContent()
 	XMStoreFloat3(&disk_normal, v1);
 	disk_normal.x = -disk_normal.x;
 
-	m_particles = make_shared<ParticleSystem>(m_device);
+	m_particles = make_shared<ParticleSystem>(m_device, DISK_ROTATION - XM_PIDIV4);
 	m_particles->SetViewMtxBuffer(m_viewCB);
 	m_particles->SetProjMtxBuffer(m_projCB);
 	m_particles->SetWorldMtxBuffer(m_worldCB);
@@ -375,13 +375,11 @@ void Robot::DrawMirroredWorld()
 	DrawDisk();
 	DrawCylinder();
 	m_phongEffect->End();
-
-	//m_context->OMSetBlendState(m_bsAlpha.get(), nullptr, BS_MASK);
-	//m_context->OMSetDepthStencilState(m_dssNoWrite.get(), 0);
-	//m_particles->Render(m_context);
-	//m_context->OMSetDepthStencilState(nullptr, 0);
-	//m_context->OMSetBlendState(nullptr, nullptr, BS_MASK);
-
+	m_phongEffect->Begin(m_context);
+	m_context->OMSetBlendState(m_bsAlpha.get(), nullptr, BS_MASK);
+	m_particles->Render(m_context);
+	m_context->OMSetBlendState(nullptr, nullptr, BS_MASK);
+	m_phongEffect->End();
 	UpdateCamera(temp);
 
 	m_context->RSSetState(nullptr);
@@ -405,16 +403,18 @@ void Robot::Render()
 	m_phongEffect->End();
 
 	m_context->OMSetBlendState(m_bsAlpha.get(), nullptr, BS_MASK);
+	m_context->OMSetDepthStencilState(m_dssNoWrite.get(), 0);
+	m_particles->Render(m_context);
+	m_context->OMSetDepthStencilState(nullptr, 0);
+	m_context->OMSetBlendState(nullptr, nullptr, BS_MASK);
+
+	m_phongEffect->Begin(m_context);	
+	m_context->OMSetBlendState(m_bsAlpha.get(), nullptr, BS_MASK);
 	m_surfaceColorCB->Update(m_context, XMFLOAT4(1.0f, 1.0f, 1.0f, 0.5f));
 	DrawPlateRight();
 	DrawPlateLeft();
 	m_context->OMSetBlendState(nullptr, nullptr, BS_MASK);
-
-	/*m_context->OMSetBlendState(m_bsAlpha.get(), nullptr, BS_MASK);
-	m_context->OMSetDepthStencilState(m_dssNoWrite.get(), 0);
-	m_particles->Render(m_context);
-	m_context->OMSetDepthStencilState(nullptr, 0);
-	m_context->OMSetBlendState(nullptr, nullptr, BS_MASK);*/
+	m_phongEffect->End();
 	
 	m_swapChain->Present(0, 0);
 }

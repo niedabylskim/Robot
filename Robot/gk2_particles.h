@@ -52,7 +52,7 @@ namespace gk2
 	class ParticleSystem
 	{
 	public:
-		ParticleSystem(DeviceHelper& device);
+		ParticleSystem(DeviceHelper& device, float maxAngle);
 
 		void SetViewMtxBuffer(const std::shared_ptr<CBMatrix>& view);
 		void SetProjMtxBuffer(const std::shared_ptr<CBMatrix>& proj);
@@ -65,7 +65,7 @@ namespace gk2
 		static const DirectX::XMFLOAT3 EMITTER_DIR;	//mean direction of particles' velocity
 		static const float TIME_TO_LIVE;	//time of particle's life in seconds
 		static const float EMISSION_RATE;	//number of particles to be born per second
-		static const float MAX_ANGLE;		//maximal angle declination from mean direction
+		float MAX_ANGLE;		//maximal angle declination from mean direction
 		static const float MIN_VELOCITY;	//minimal value of particle's velocity
 		static const float MAX_VELOCITY;	//maximal value of particle's velocity
 		static const float PARTICLE_SIZE;	//initial size of a particle
