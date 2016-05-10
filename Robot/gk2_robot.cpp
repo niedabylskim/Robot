@@ -478,17 +478,17 @@ void Robot::DrawMirroredWorld()
 
 	UpdateCamera(view);
 
-	m_phongEffect->Begin(m_context);
+	//m_phongEffect->Begin(m_context);
 	DrawRobot();
 	DrawDisk();
 	DrawCylinder();
-	m_phongEffect->End();
+	//m_phongEffect->End();
 
-	m_phongEffect->Begin(m_context);
+	//m_phongEffect->Begin(m_context);
 	m_context->OMSetBlendState(m_bsAlpha2.get(), nullptr, BS_MASK);
 	m_particles->Render(m_context);
 	m_context->OMSetBlendState(nullptr, nullptr, BS_MASK);
-	m_phongEffect->End();
+	//m_phongEffect->End();
 	UpdateCamera(temp);
 
 	m_context->RSSetState(nullptr);
@@ -500,11 +500,12 @@ void Robot::DrawScene()
 	float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	UINT sampleMask = 0xffffffff;
 	GetShadowMeshes();
-
+	DrawMirroredWorld();
 	m_phongEffect->Begin(m_context);
 	DrawSceneElements(XMFLOAT4(0.05f, 0.05f, 0.05f, 1.0f));
 	m_phongEffect->End();
-	
+	//
+	m_context->ClearDepthStencilView(m_depthStencilView.get(), D3D11_CLEAR_STENCIL, 1.0f, 0);
 	m_context->RSSetState(m_rsCullBack.get());
 
 	//// inkrementacja bufora szablonu
@@ -515,7 +516,7 @@ void Robot::DrawScene()
 
 	// renderowanie bry³ cieni
 	DrawShadows();
-
+	DrawGround();
 	// renderowanie œcian tylnych
 	m_context->RSSetState(m_rsCullFront.get());
 
@@ -553,7 +554,7 @@ void Robot::Render()
 	m_projCB->Update(m_context, m_projMtx);
 	//SetLight();
 
-	DrawMirroredWorld();
+	/*DrawMirroredWorld();*/
 	//m_phongEffect->Begin(m_context);
 	DrawScene();
 	//m_phongEffect->End();
