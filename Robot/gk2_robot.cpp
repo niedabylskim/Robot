@@ -13,7 +13,7 @@ const unsigned int Robot::BS_MASK = 0xffffffff;
 const float Robot::DISK_R = 0.3f;
 const float Robot::DISK_POSITION = -1.51f;
 const float Robot::DISK_ROTATION = XM_PI / 4.0f;
-const XMFLOAT4 Robot::lightPosition = XMFLOAT4(-2, 2, -5,1);
+const XMFLOAT4 Robot::lightPosition = XMFLOAT4(-2, 2, -5, 1);
 float Robot::disk_angle = 0.0f;
 Robot::Robot(HINSTANCE hInstance)
 	: ApplicationBase(hInstance), m_camera(0.001f, 100.0f)
@@ -67,23 +67,23 @@ void Robot::CreateScene()
 	m_parts[4] = loader.LoadMesh(L"resources/meshes/mesh5.txt");
 	m_parts[5] = loader.LoadMesh(L"resources/meshes/mesh6.txt");
 	m_ground = loader.GetQuad(1.0f);
-	m_ground.setWorldMatrix(XMMatrixTranslation(0,-1,0));
+	m_ground.setWorldMatrix(XMMatrixTranslation(0, -1, 0));
 	m_ground = loader.GetQuad(1.0f);
-	m_light = loader.GetSphere(100,100,0.5);
+	m_light = loader.GetSphere(100, 100, 0.5);
 	m_light.setWorldMatrix(XMMatrixTranslation(lightPosition.x, lightPosition.y, lightPosition.z));
 	m_ground.setWorldMatrix(XMMatrixTranslation(0, -1.01f, 0));
 	m_plateRight = loader.GetRightSideQuad(.1f);
-	m_plateRight.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2 + DISK_ROTATION) * XMMatrixTranslation(DISK_POSITION-0.01f, 0.0f, 0.0f));
+	m_plateRight.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2 + DISK_ROTATION) * XMMatrixTranslation(DISK_POSITION - 0.01f, 0.0f, 0.0f));
 	m_plateLeft = loader.GetLeftSideQuad(.1f);
 	m_plateLeft.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2 + DISK_ROTATION) * XMMatrixTranslation(DISK_POSITION - 0.01f, 0.0f, 0.0f));
 	m_disk = loader.GetDisc(50, 0.02f);
 	m_disk.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2 + DISK_ROTATION) * XMMatrixTranslation(DISK_POSITION, 0.0f, 0.0f));
 	m_lidCyl1 = loader.GetDisc(50, 0.5f);
-	m_lidCyl1.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2) * XMMatrixTranslation(-lightPosition.x/3-0.75f, -0.5f, 2.0f));
+	m_lidCyl1.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2) * XMMatrixTranslation(-lightPosition.x / 3 - 0.75f, -0.5f, 2.0f));
 	m_lidCyl2 = loader.GetDisc(50, 0.5f);
-	m_lidCyl2.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2) * XMMatrixTranslation(-lightPosition.x/3 + 0.75f, -0.5f, 2.0f));
+	m_lidCyl2.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2) * XMMatrixTranslation(-lightPosition.x / 3 + 0.75f, -0.5f, 2.0f));
 	m_cylinder = loader.GetCylinder(50, 50, 0.5f, 1.5f);
-	m_cylinder.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2)* XMMatrixTranslation(-lightPosition.x/3, -0.5f, 2.0f));
+	m_cylinder.setWorldMatrix(XMMatrixRotationZ(XM_PIDIV2)* XMMatrixTranslation(-lightPosition.x / 3, -0.5f, 2.0f));
 }
 
 void Robot::InitializeRenderStates()
@@ -91,7 +91,7 @@ void Robot::InitializeRenderStates()
 	auto rsDesc = m_device.DefaultRasterizerDesc();
 	rsDesc.CullMode = D3D11_CULL_BACK;
 	m_rsCullBack = m_device.CreateRasterizerState(rsDesc);
-	
+
 	rsDesc = m_device.DefaultRasterizerDesc();
 	rsDesc.CullMode = D3D11_CULL_NONE;
 	m_rsCullNone = m_device.CreateRasterizerState(rsDesc);
@@ -184,8 +184,6 @@ void Robot::InitializeRenderStates()
 	dssDesc.StencilEnable = true;
 	dssDesc.StencilWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 	dssDesc.FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL;
-	dssDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	dssDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
 	m_dssStencilTest = m_device.CreateDepthStencilState(dssDesc);
 }
 
@@ -203,6 +201,7 @@ bool Robot::LoadContent()
 	m_phongEffect->SetLightPosBuffer(m_lightPosCB);
 	m_phongEffect->SetSurfaceColorBuffer(m_surfaceColorCB);
 	m_phongEffect->SetAmbientBuffer(m_lightAmbient);
+	m_lightAmbient->Update(m_context, XMFLOAT4(0.1f, .1f, 0.1f, 1.0f));
 	disk_normal = XMFLOAT3(0, 1, 0);
 	XMVECTOR v = XMLoadFloat3(&disk_normal);
 	XMVECTOR v1 = XMVector3TransformCoord(v, XMMatrixRotationZ(-XM_PI / 4.0f)* XMMatrixTranslation(-1.50f, 0, 0));
@@ -292,12 +291,12 @@ void Robot::Update(float dt)
 		if (prevState.isButtonDown(0))
 		{
 			auto d = currentState.getMousePositionChange();
-			m_camera.Rotate(d.y/300.f, d.x/300.f);
+			m_camera.Rotate(d.y / 300.f, d.x / 300.f);
 		}
 		else if (prevState.isButtonDown(1))
 		{
 			auto d = currentState.getMousePositionChange();
-			m_camera.Move(XMFLOAT3(d.x/100.0f,d.y/100.0f,0.0f));
+			m_camera.Move(XMFLOAT3(d.x / 100.0f, d.y / 100.0f, 0.0f));
 		}
 		else if (prevState.isButtonDown(2))
 		{
@@ -311,7 +310,7 @@ void Robot::Update(float dt)
 			UpdateCamera();
 	}
 	UpdateDiskPosition(dt);
-	UpdateRobot(); 
+	UpdateRobot();
 	XMFLOAT3 discPos = GetDiscPos();
 	discPos.z *= -1;
 
@@ -322,7 +321,7 @@ void Robot::UpdateRobot()
 {
 	float a1, a2, a3, a4, a5;
 	float l1 = .91f, l2 = .81f, l3 = .33f, dy = .27f, dz = -.26f;
-	
+
 	inverse_kinematics(GetDiscPos(), disk_normal, a1, a2, a3, a4, a5);
 
 	m_parts[0].setWorldMatrix(XMMatrixScaling(1, 1, -1));
@@ -412,10 +411,9 @@ void Robot::DrawSceneElements(DirectX::XMFLOAT4 ambient)
 	m_light.Render(m_context);
 	m_surfaceColorCB->Update(m_context, XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
 	m_lightAmbient->Update(m_context, ambient);
-
-	m_context->OMSetDepthStencilState(m_dssTest.get(), 0);
+	m_context->OMSetDepthStencilState(m_dssStencilTest.get(), 0);
 	DrawGround();
-	m_context->OMSetDepthStencilState(tmp.get(), 0);
+	m_context->OMSetDepthStencilState(nullptr, 0);
 	DrawRobot();
 	DrawDisk();
 	DrawCylinder();
@@ -429,10 +427,10 @@ void Robot::DrawSceneElements2(DirectX::XMFLOAT4 ambient)
 	m_light.Render(m_context);
 	m_surfaceColorCB->Update(m_context, XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
 	m_lightAmbient->Update(m_context, ambient);
-	
-	
 	DrawGround();
+	m_context->OMSetDepthStencilState(nullptr, 0);
 	DrawRobot();
+	m_context->OMSetDepthStencilState(m_dssStencilTest.get(), 0);
 	DrawDisk();
 	DrawCylinder();
 }
@@ -465,11 +463,11 @@ void Robot::GetShadowMeshes()
 
 void Robot::DrawMirroredWorld()
 {
-	m_context->OMSetDepthStencilState(m_dssWrite.get(), 1);
+	m_phongEffect->Begin(m_context);
+	m_context->OMSetDepthStencilState(m_dssWrite.get(), 10);
 	m_surfaceColorCB->Update(m_context, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.2f));
 	DrawPlateRight();
-	m_context->OMSetDepthStencilState(m_dssTest.get(), 1);
-
+	m_context->OMSetDepthStencilState(m_dssTest.get(), 10);
 	m_context->RSSetState(m_rsCounterClockwise.get());
 	XMMATRIX view = m_camera.GetViewMatrix();
 	XMMATRIX temp = m_camera.GetViewMatrix();
@@ -478,34 +476,31 @@ void Robot::DrawMirroredWorld()
 
 	UpdateCamera(view);
 
-	//m_phongEffect->Begin(m_context);
 	DrawRobot();
 	DrawDisk();
 	DrawCylinder();
-	//m_phongEffect->End();
 
-	//m_phongEffect->Begin(m_context);
 	m_context->OMSetBlendState(m_bsAlpha2.get(), nullptr, BS_MASK);
 	m_particles->Render(m_context);
 	m_context->OMSetBlendState(nullptr, nullptr, BS_MASK);
-	//m_phongEffect->End();
 	UpdateCamera(temp);
 
 	m_context->RSSetState(nullptr);
 	m_context->OMSetDepthStencilState(nullptr, 0);
+	m_phongEffect->End();
 }
 
 void Robot::DrawScene()
 {
-	float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	UINT sampleMask = 0xffffffff;
 	GetShadowMeshes();
+
 	DrawMirroredWorld();
 	m_phongEffect->Begin(m_context);
 	DrawSceneElements(XMFLOAT4(0.05f, 0.05f, 0.05f, 1.0f));
 	m_phongEffect->End();
 	//
-	m_context->ClearDepthStencilView(m_depthStencilView.get(), D3D11_CLEAR_STENCIL, 1.0f, 0);
 	m_context->RSSetState(m_rsCullBack.get());
 
 	//// inkrementacja bufora szablonu
@@ -516,7 +511,6 @@ void Robot::DrawScene()
 
 	// renderowanie bry³ cieni
 	DrawShadows();
-	DrawGround();
 	// renderowanie œcian tylnych
 	m_context->RSSetState(m_rsCullFront.get());
 
@@ -539,9 +533,12 @@ void Robot::DrawScene()
 	m_context->OMSetDepthStencilState(m_dssStencilTest.get(), 0);
 
 	// renderowanie z oœwietleniem
+
 	m_phongEffect->Begin(m_context);
+	//DrawMirroredWorld2();
 	DrawSceneElements2(XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f));
 	m_phongEffect->End();
+
 }
 
 void Robot::Render()
