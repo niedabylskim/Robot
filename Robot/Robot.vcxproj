@@ -85,9 +85,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>d3d11.lib;dinput8.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -151,6 +154,7 @@
     <ClInclude Include="gk2_meshLoader.h" />
     <ClInclude Include="gk2_particles.h" />
     <ClInclude Include="gk2_phongEffect.h" />
+    <ClInclude Include="gk2_plate.h" />
     <ClInclude Include="gk2_robot.h" />
     <ClInclude Include="gk2_utils.h" />
     <ClInclude Include="gk2_vertices.h" />

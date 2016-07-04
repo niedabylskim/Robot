@@ -143,6 +143,9 @@
     <ClInclude Include="gk2_particles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gk2_plate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\meshes\chair_back.mesh">
